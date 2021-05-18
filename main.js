@@ -7,30 +7,13 @@ app.use(express.static('public'));
 app.set('port', 6531);
 app.use(express.json());
 
-//Queries
-//TODO
-
-// Get all rows
-app.get('/', (req, res) => {
-    //TODO
-});
-
-
-// Add new row to table
-app.post('/', (req, res) => {
-    //TODO
-
-});
-
-
-app.delete('/', (req, res) => {
-    //TODO
-});
-
-app.get('/reset-table', (req, res, next) => {
-    //TODO
-});
-
+app.use(bodyParser.urlencoded({extended:true}));
+// app.use('/static', express.static('public'));
+app.set('mysql', mysql);
+app.use('/sake', require('./sake.js'));
+app.use('/company', require('./company.js'));
+app.use('/review', require('./review.js'));
+app.use('/reviewer', require('./reviewer.js'));
 
 app.use(function(req,res){
   res.type('text/plain');
