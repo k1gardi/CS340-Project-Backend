@@ -2,18 +2,18 @@ const express = require('express');
 const app = express();
 const mysql = require('./dbcon');
 
-
 app.use(express.static('public'));
 app.set('port', 6531);
 app.use(express.json());
 
-app.use(bodyParser.urlencoded({extended:true}));
+app.use(express.urlencoded({extended:true}));
 // app.use('/static', express.static('public'));
 app.set('mysql', mysql);
 app.use('/sake', require('./sake.js'));
-app.use('/company', require('./company.js'));
-app.use('/review', require('./review.js'));
-app.use('/reviewer', require('./reviewer.js'));
+// app.use('/company', require('./company.js'));
+// app.use('/review', require('./review.js'));
+// app.use('/reviewer', require('./reviewer.js'));
+// app.use('/', express.static('public'));
 
 app.use(function(req,res){
   res.type('text/plain');
