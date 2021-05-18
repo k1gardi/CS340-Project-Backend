@@ -5,16 +5,16 @@ const mysql = require('./dbcon');
 
 app.use(cors());
 app.use(express.static('public'));
-app.set('port', 6531);
 app.use(express.json());
+app.set('port', 6531);
 
 app.use(express.urlencoded({extended:true}));
 // app.use('/static', express.static('public'));
 app.set('mysql', mysql);
 app.use('/sake', require('./sake.js'));
-// app.use('/company', require('./company.js'));
-// app.use('/review', require('./review.js'));
-// app.use('/reviewer', require('./reviewer.js'));
+app.use('/company', require('./company.js'));
+app.use('/review', require('./review.js'));
+app.use('/reviewer', require('./reviewer.js'));
 // app.use('/', express.static('public'));
 
 app.use(function(req,res){
