@@ -1,7 +1,9 @@
 const express = require('express');
 const app = express();
+const cors = require("cors");
 const mysql = require('./dbcon');
 
+app.use(cors());
 app.use(express.static('public'));
 app.set('port', 6531);
 app.use(express.json());
