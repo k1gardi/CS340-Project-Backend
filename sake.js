@@ -128,6 +128,17 @@ module.exports = (function () {
   //   }
   // });
 
+  /* Get all sake */
+
+  
+  router.get("/", function (req, res) {
+      var context = {};
+
+      var mysql = req.app.get("mysql");
+      getSake(res, mysql, context);
+     
+    });
+    
   /* Adds a sake */
 
   router.post("/", function (req, res) {
