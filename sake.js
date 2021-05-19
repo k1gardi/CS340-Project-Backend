@@ -21,7 +21,7 @@ module.exports = (function () {
   /* Find sake whose sakeName contains a given string in the req */
   function getSakeName(req, res, mysql, context) {
     
-    var query = "SELECT * FROM Sake WHERE " ;
+    var query = "SELECT *, (SELECT AVG(Review.rating) from Review where Review.sakeID = Sake.sakeID) AS averageRating FROM Sake WHERE " ;
     const existingParams = [].filter(field => req.params[field]);
     query += existingParams.map(field => `${field} = ?`).join(" REGEXP ");
 
@@ -41,7 +41,7 @@ module.exports = (function () {
   function getSakeCompanyID(req, res, mysql, context) {
     //
     var query =
-      "SELECT * FROM Sake WHERE companyID REGEXP " +
+      "SELECT *, (SELECT AVG(Review.rating) from Review where Review.sakeID = Sake.sakeID) AS averageRating FROM Sake WHERE companyID REGEXP " +
       mysql.pool.escape(req.params.s);
     console.log(query);
 
@@ -58,65 +58,65 @@ module.exports = (function () {
   }
 
 
-    /* Find sake whose region contains a given string in the req */
-    function getSakeRegion(req, res, mysql, context) {
-      //
-      var query =
-        "SELECT * FROM Sake WHERE region REGEXP " +
-        mysql.pool.escape(req.params.s);
-      console.log(query);
+  /* Find sake whose region contains a given string in the req */
+  function getSakeRegion(req, res, mysql, context) {
+    //
+    var query =
+      "SELECT *, (SELECT AVG(Review.rating) from Review where Review.sakeID = Sake.sakeID) AS averageRating FROM Sake WHERE region REGEXP " +
+      mysql.pool.escape(req.params.s);
+    console.log(query);
+
+    mysql.pool.query(query, function (error, results, fields) {
+      if (error) {
+        res.write(JSON.stringify(error));
+        res.end();
+      }
+      context.region = JSON.stringify(results);
+      res.setHeader("Content-Type", "application/json");
+      console.log(context);
+      res.send(context);
+    });
+  }
   
-      mysql.pool.query(query, function (error, results, fields) {
-        if (error) {
-          res.write(JSON.stringify(error));
-          res.end();
-        }
-        context.region = JSON.stringify(results);
-        res.setHeader("Content-Type", "application/json");
-        console.log(context);
-        res.send(context);
-      });
-    }
-  
-        /* Find sake whose style contains a given string in the req */
-        function getSakeStyle(req, res, mysql, context) {
-          //
-          var query =
-            "SELECT * FROM Sake WHERE style REGEXP " +
-            mysql.pool.escape(req.params.s);
-          console.log(query);
-      
-          mysql.pool.query(query, function (error, results, fields) {
-            if (error) {
-              res.write(JSON.stringify(error));
-              res.end();
-            }
-            context.style = JSON.stringify(results);
-            res.setHeader("Content-Type", "application/json");
-            console.log(context);
-            res.send(context);
-          });
-        }
+  /* Find sake whose style contains a given string in the req */
+  function getSakeStyle(req, res, mysql, context) {
+    //
+    var query =
+      "SELECT *, (SELECT AVG(Review.rating) from Review where Review.sakeID = Sake.sakeID) AS averageRating FROM Sake WHERE style REGEXP " +
+      mysql.pool.escape(req.params.s);
+    console.log(query);
+
+    mysql.pool.query(query, function (error, results, fields) {
+      if (error) {
+        res.write(JSON.stringify(error));
+        res.end();
+      }
+      context.style = JSON.stringify(results);
+      res.setHeader("Content-Type", "application/json");
+      console.log(context);
+      res.send(context);
+    });
+  }
     
-    /* Find sake whose region contains a given string in the req */
-    function getSakeCultivar(req, res, mysql, context) {
-      //
-      var query =
-        "SELECT * FROM Sake WHERE cultivar REGEXP " +
-        mysql.pool.escape(req.params.s);
-      console.log(query);
-  
-      mysql.pool.query(query, function (error, results, fields) {
-        if (error) {
-          res.write(JSON.stringify(error));
-          res.end();
-        }
-        context.cultivar = JSON.stringify(results);
-        res.setHeader("Content-Type", "application/json");
-        console.log(context);
-        res.send(context);
-      });
-    }
+  /* Find sake whose region contains a given string in the req */
+  function getSakeCultivar(req, res, mysql, context) {
+    //
+    var query =
+      "SELECT *, (SELECT AVG(Review.rating) from Review where Review.sakeID = Sake.sakeID) AS averageRating FROM Sake WHERE cultivar REGEXP " +
+      mysql.pool.escape(req.params.s);
+    console.log(query);
+
+    mysql.pool.query(query, function (error, results, fields) {
+      if (error) {
+        res.write(JSON.stringify(error));
+        res.end();
+      }
+      context.cultivar = JSON.stringify(results);
+      res.setHeader("Content-Type", "application/json");
+      console.log(context);
+      res.send(context);
+    });
+  }
 
 //   function getPerson(res, mysql, context, id, complete) {
 //     var sql =
@@ -132,24 +132,40 @@ module.exports = (function () {
 //     });
 //   }
 
-  /* Get all sake */
+/* Find sake whose region contains a given string in the req */
+function getSomeSake(filter, res, mysql, context) {
+  //
+  var query = `SELECT *, (SELECT AVG(Review.rating) from Review where Review.sakeID = Sake.sakeID) AS averageRating FROM Sake WHERE ${filter.col} = "${filter.q}";`;
+  console.log(query);
+
+  mysql.pool.query(query, function (error, results, fields) {
+    if (error) {
+      res.write(JSON.stringify(error));
+      res.end();
+    }
+    context.sake = JSON.stringify(results);
+    res.setHeader("Content-Type", "application/json");
+    console.log(context);
+    res.send(context);
+  });
+}
+
+  /* Get sake */
 
   router.get("/", function (req, res) {
     var context = {};
-
     var mysql = req.app.get("mysql");
-    getSake(res, mysql, context);
+    console.log(req.query);
+    // Is this a request for all sake?
+    if (Object.keys(req.query).length === 0) {
+      getSake(res, mysql, context);
+    }
+    // Else this is a filtered request
+    else {
+      filter = req.query
+      getSomeSake(filter, res, mysql, context);
+    }
    
-  });
-
-  /* Sake search/filter get request */
-
-  router.get("/?", function (req, res) {
-    var context = {};
-
-    var mysql = req.app.get("mysql");
-    getSakeName(req, res, mysql, context);
-
   });
 
 //   /*Display all people from a given homeworld. Requires web based javascript to delete users with AJAX*/
