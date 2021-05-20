@@ -50,7 +50,7 @@ module.exports = (function () {
   //     });
   //   }
   
-    /* Get all Reviews */
+    /* Get all Companies */
   
     router.get("/", function (req, res) {
       var context = {};
@@ -58,6 +58,27 @@ module.exports = (function () {
       var mysql = req.app.get("mysql");
       getCompany(res, mysql, context);
      
+    });
+
+    /* Get all Company IDs and names*/
+
+    router.get("/dropdown/", function (req, res) {
+      var context = {};
+  
+      var mysql = req.app.get("mysql");
+      mysql.pool.query(
+        "SELECT companyID, companyName FROM Company",
+        function (error, results, fields) {
+          if (error) {
+            res.write(JSON.stringify(error));
+            res.end();
+          }
+          context.company = JSON.stringify(results);
+          res.setHeader("Content-Type", "application/json");
+          console.log(context);
+          res.send(context);
+        }
+      );
     });
   
   //   /*Display all people from a given homeworld. Requires web based javascript to delete users with AJAX*/
