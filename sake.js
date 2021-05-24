@@ -4,7 +4,7 @@ module.exports = (function () {
 
   function getSake(res, mysql, context) {
     mysql.pool.query(
-      "SELECT *, (SELECT AVG(Review.rating) from Review where Review.sakeID = Sake.sakeID) AS averageRating FROM Sake",
+      "SELECT Sake.sakeID, Sake.sakeName, Company.companyName, Sake.region, Sake.style, Sake.cultivar, (SELECT AVG(Review.rating) from Review where Review.sakeID = Sake.sakeID) AS averageRating FROM Sake LEFT JOIN Company ON Sake.companyID = Company.companyID",
       function (error, results, fields) {
         if (error) {
           res.write(JSON.stringify(error));
@@ -18,124 +18,10 @@ module.exports = (function () {
     );
   }
 
-  /* Find sake whose sakeName contains a given string in the req */
-  function getSakeName(req, res, mysql, context) {
-    
-    var query = "SELECT *, (SELECT AVG(Review.rating) from Review where Review.sakeID = Sake.sakeID) AS averageRating FROM Sake WHERE " ;
-    const existingParams = [].filter(field => req.params[field]);
-    query += existingParams.map(field => `${field} = ?`).join(" REGEXP ");
-
-    mysql.pool.query(query, function (error, results, fields) {
-      if (error) {
-        res.write(JSON.stringify(error));
-        res.end();
-      }
-      context.sake = JSON.stringify(results);
-      res.setHeader("Content-Type", "application/json");
-      console.log(context);
-      res.send(context);
-    });
-  }
-
-  /* Find sake whose companyID contains a given int in the req */
-  function getSakeCompanyID(req, res, mysql, context) {
-    //
-    var query =
-      "SELECT *, (SELECT AVG(Review.rating) from Review where Review.sakeID = Sake.sakeID) AS averageRating FROM Sake WHERE companyID REGEXP " +
-      mysql.pool.escape(req.params.s);
-    console.log(query);
-
-    mysql.pool.query(query, function (error, results, fields) {
-      if (error) {
-        res.write(JSON.stringify(error));
-        res.end();
-      }
-      context.companyID = JSON.stringify(results);
-      res.setHeader("Content-Type", "application/json");
-      console.log(context);
-      res.send(context);
-    });
-  }
-
-
-  /* Find sake whose region contains a given string in the req */
-  function getSakeRegion(req, res, mysql, context) {
-    //
-    var query =
-      "SELECT *, (SELECT AVG(Review.rating) from Review where Review.sakeID = Sake.sakeID) AS averageRating FROM Sake WHERE region REGEXP " +
-      mysql.pool.escape(req.params.s);
-    console.log(query);
-
-    mysql.pool.query(query, function (error, results, fields) {
-      if (error) {
-        res.write(JSON.stringify(error));
-        res.end();
-      }
-      context.region = JSON.stringify(results);
-      res.setHeader("Content-Type", "application/json");
-      console.log(context);
-      res.send(context);
-    });
-  }
-  
-  /* Find sake whose style contains a given string in the req */
-  function getSakeStyle(req, res, mysql, context) {
-    //
-    var query =
-      "SELECT *, (SELECT AVG(Review.rating) from Review where Review.sakeID = Sake.sakeID) AS averageRating FROM Sake WHERE style REGEXP " +
-      mysql.pool.escape(req.params.s);
-    console.log(query);
-
-    mysql.pool.query(query, function (error, results, fields) {
-      if (error) {
-        res.write(JSON.stringify(error));
-        res.end();
-      }
-      context.style = JSON.stringify(results);
-      res.setHeader("Content-Type", "application/json");
-      console.log(context);
-      res.send(context);
-    });
-  }
-    
-  /* Find sake whose region contains a given string in the req */
-  function getSakeCultivar(req, res, mysql, context) {
-    //
-    var query =
-      "SELECT *, (SELECT AVG(Review.rating) from Review where Review.sakeID = Sake.sakeID) AS averageRating FROM Sake WHERE cultivar REGEXP " +
-      mysql.pool.escape(req.params.s);
-    console.log(query);
-
-    mysql.pool.query(query, function (error, results, fields) {
-      if (error) {
-        res.write(JSON.stringify(error));
-        res.end();
-      }
-      context.cultivar = JSON.stringify(results);
-      res.setHeader("Content-Type", "application/json");
-      console.log(context);
-      res.send(context);
-    });
-  }
-
-//   function getPerson(res, mysql, context, id, complete) {
-//     var sql =
-//       "SELECT character_id as id, fname, lname, homeworld, age FROM bsg_people WHERE character_id = ?";
-//     var inserts = [id];
-//     mysql.pool.query(sql, inserts, function (error, results, fields) {
-//       if (error) {
-//         res.write(JSON.stringify(error));
-//         res.end();
-//       }
-//       context.person = results[0];
-//       complete();
-//     });
-//   }
-
-/* Find sake whose region contains a given string in the req */
+/* Find sake based on search filter and a given string in the req */
 function getSomeSake(filter, res, mysql, context) {
   //
-  var query = `SELECT *, (SELECT AVG(Review.rating) from Review where Review.sakeID = Sake.sakeID) AS averageRating FROM Sake WHERE ${filter.col} = "${filter.q}";`;
+  var query = `SELECT Sake.sakeID, Sake.sakeName, Company.companyName, Sake.region, Sake.style, Sake.cultivar, (SELECT AVG(Review.rating) from Review where Review.sakeID = Sake.sakeID) AS averageRating FROM Sake LEFT JOIN Company ON Sake.companyID = Company.companyID WHERE ${filter.col} REGEXP "${filter.q}";`;
   console.log(query);
 
   mysql.pool.query(query, function (error, results, fields) {
@@ -156,7 +42,7 @@ function getSomeSake(filter, res, mysql, context) {
     var context = {};
     var mysql = req.app.get("mysql");
     console.log(req.query);
-    // Is this a request for all sake?
+    // Check if query contains filter criteria
     if (Object.keys(req.query).length === 0) {
       getSake(res, mysql, context);
     }

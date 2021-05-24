@@ -3,8 +3,8 @@ module.exports = (function () {
     var router = express.Router();
   
     function getReview(res, mysql, context) {
-      mysql.pool.query(
-        "SELECT * FROM Review",
+      mysql.pool.query("SELECT Review.reviewID, Sake.sakeName, CONCAT(Reviewer.fName, ' ', Reviewer.lName) AS reviewerName, Review.rating, Review.comment FROM Review LEFT JOIN Sake ON Review.sakeID = Sake.sakeID LEFT JOIN Reviewer ON Review.personID = Reviewer.personID",
+        //"SELECT * FROM Review",
         function (error, results, fields) {
           if (error) {
             res.write(JSON.stringify(error));
