@@ -54,6 +54,27 @@ function getSomeSake(filter, res, mysql, context) {
    
   });
 
+  /* Get all Sake IDs and names*/
+
+  router.get("/dropdown/", function (req, res) {
+    var context = {};
+
+    var mysql = req.app.get("mysql");
+    mysql.pool.query(
+      "SELECT sakeID, sakeName FROM Sake ORDER BY sakeID ASC",
+      function (error, results, fields) {
+        if (error) {
+          res.write(JSON.stringify(error));
+          res.end();
+        }
+        context.sake = JSON.stringify(results);
+        res.setHeader("Content-Type", "application/json");
+        console.log(context);
+        res.send(context);
+      }
+    );
+  });
+
 //   /*Display all people from a given homeworld. Requires web based javascript to delete users with AJAX*/
 //   router.get("/filter/:homeworld", function (req, res) {
 //     var callbackCount = 0;

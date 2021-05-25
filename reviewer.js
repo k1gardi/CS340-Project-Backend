@@ -1,33 +1,57 @@
 module.exports = (function () {
-    var express = require("express");
-    var router = express.Router();
-  
-    function getReviewer(res, mysql, context) {
-      mysql.pool.query(
-        "SELECT * FROM Reviewer",
-        function (error, results, fields) {
-          if (error) {
-            res.write(JSON.stringify(error));
-            res.end();
-          }
-          context.reviewer = JSON.stringify(results);
-          res.setHeader("Content-Type", "application/json");
-          console.log(context);
-          res.send(context);
+  var express = require("express");
+  var router = express.Router();
+
+  function getReviewer(res, mysql, context) {
+    mysql.pool.query(
+      "SELECT * FROM Reviewer",
+      function (error, results, fields) {
+        if (error) {
+          res.write(JSON.stringify(error));
+          res.end();
         }
-      );
-    }
+        context.reviewer = JSON.stringify(results);
+        res.setHeader("Content-Type", "application/json");
+        console.log(context);
+        res.send(context);
+      }
+    );
+  }
   
-    /* Get all Reviewers */
-  
-    router.get("/", function (req, res) {
-      var context = {};
-  
-      var mysql = req.app.get("mysql");
-      getReviewer(res, mysql, context);
-     
-    });
-  
+  /* Get all Reviewers */
+
+  router.get("/", function (req, res) {
+    var context = {};
+
+    var mysql = req.app.get("mysql");
+    getReviewer(res, mysql, context);
+    
+  });
+
+
+  /* Get all reviewer IDs and names*/
+
+  router.get("/dropdown/", function (req, res) {
+    var context = {};
+
+    var mysql = req.app.get("mysql");
+    mysql.pool.query(
+      "SELECT personID, CONCAT(fName, ' ', lName) as reviewerName FROM Reviewer ORDER BY personID ASC",
+      function (error, results, fields) {
+        if (error) {
+          res.write(JSON.stringify(error));
+          res.end();
+        }
+        context.reviewers = JSON.stringify(results);
+        res.setHeader("Content-Type", "application/json");
+        console.log(context);
+        res.send(context);
+      }
+    );
+  });
+
+
+
   //   /*Display all people from a given homeworld. Requires web based javascript to delete users with AJAX*/
   //   router.get("/filter/:homeworld", function (req, res) {
   //     var callbackCount = 0;

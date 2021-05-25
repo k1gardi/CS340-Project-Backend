@@ -35,7 +35,7 @@ module.exports = (function () {
   
       var mysql = req.app.get("mysql");
       mysql.pool.query(
-        "SELECT companyName FROM Company",
+        "SELECT companyID, companyName FROM Company",
         function (error, results, fields) {
           if (error) {
             res.write(JSON.stringify(error));
