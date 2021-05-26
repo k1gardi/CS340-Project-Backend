@@ -187,6 +187,31 @@ module.exports = (function () {
     //   });
     // });
   
+
+     /* Delete Review */
+
+    router.delete('/', (req, res) => {
+      var context = {};
+      let id = req.body.reviewID;
+      let queryString = `DELETE FROM Review WHERE reviewID = ${id}`;
+      console.log(queryString);
+  
+      var mysql = req.app.get("mysql");
+      mysql.pool.query(
+        queryString,
+        (error, results, fields) => {
+          if (error) {
+            res.write(JSON.stringify(error));
+            res.status(400);
+            res.end();
+          } else{
+          context.sake = JSON.stringify(results);
+          res.send(context);
+          }
+        }
+      );
+    });
+  
     return router;
   })();
   

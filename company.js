@@ -189,6 +189,7 @@ module.exports = (function () {
         (error, results, fields) => {
           if (error) {
             res.write(JSON.stringify(error));
+            res.status(400);
             res.end();
           } else{
           context.sake = JSON.stringify(results);
