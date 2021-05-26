@@ -4,7 +4,7 @@ module.exports = (function () {
 
   function getSake(res, mysql, context) {
     mysql.pool.query(
-      "SELECT Sake.sakeID, Sake.sakeName, Company.companyName, Sake.region, Sake.style, Sake.cultivar, (SELECT AVG(Review.rating) from Review where Review.sakeID = Sake.sakeID) AS averageRating FROM Sake LEFT JOIN Company ON Sake.companyID = Company.companyID",
+      "SELECT Sake.sakeID, Sake.sakeName, Company.companyID, Company.companyName, Sake.region, Sake.style, Sake.cultivar, (SELECT AVG(Review.rating) from Review where Review.sakeID = Sake.sakeID) AS averageRating FROM Sake LEFT JOIN Company ON Sake.companyID = Company.companyID",
       function (error, results, fields) {
         if (error) {
           res.write(JSON.stringify(error));
