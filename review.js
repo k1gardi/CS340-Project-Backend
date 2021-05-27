@@ -3,7 +3,7 @@ module.exports = (function () {
     var router = express.Router();
   
     function getReview(res, mysql, context) {
-      mysql.pool.query("SELECT Review.reviewID, Sake.sakeName, CONCAT(Reviewer.fName, ' ', Reviewer.lName) AS reviewerName, Review.rating, Review.comment FROM Review LEFT JOIN Sake ON Review.sakeID = Sake.sakeID LEFT JOIN Reviewer ON Review.personID = Reviewer.personID",
+      mysql.pool.query("SELECT Review.reviewID, Sake.sakeID, Sake.sakeName, Reviewer.personID, CONCAT(Reviewer.fName, ' ', Reviewer.lName) AS reviewerName, Review.rating, Review.comment FROM Review LEFT JOIN Sake ON Review.sakeID = Sake.sakeID LEFT JOIN Reviewer ON Review.personID = Reviewer.personID",
         //"SELECT * FROM Review",
         function (error, results, fields) {
           if (error) {
@@ -168,7 +168,34 @@ module.exports = (function () {
     //     }
     //   });
     // });
-  
+
+  /* Update a review */
+    
+  router.put("/", function (req, res) {
+    var context = {};
+    console.log(req.body);
+    var mysql = req.app.get("mysql");
+    var sql =
+      `UPDATE Review SET sakeID=?, personID=?, rating=?, comment=? WHERE reviewID=?`;
+    var inserts = [
+      req.body.data.sakeID,
+      req.body.data.personID,
+      req.body.data.rating,
+      req.body.data.comment,
+      req.body.data.reviewID,
+    ];
+    sql = mysql.pool.query(sql, inserts, function (error, results, fields) {
+      if (error) {
+        console.log(error);
+        res.write(JSON.stringify(error));
+        res.end();
+      } else {
+        context.review = JSON.stringify(results);
+        res.send(context);
+        }
+    });
+  });
+
     // /* Route to delete a person, simply returns a 202 upon success. Ajax will handle this. */
     // router.delete("/:id", function (req, res) {
     //   var mysql = req.app.get("mysql");
