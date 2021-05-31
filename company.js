@@ -54,13 +54,24 @@ module.exports = (function () {
     var context = {};
     console.log(req.body);
     var mysql = req.app.get("mysql");
-    var sql =
-      "INSERT INTO Company (companyName, location, year) VALUES (?,?,?)";
-    var inserts = [
-      req.body.payload.companyName,
-      req.body.payload.location,
-      req.body.payload.year,
-    ];
+    var sql = "";
+    var inserts;
+    if (req.body.payload.year === ""){
+      sql = "INSERT INTO Company (companyName, location) VALUES (?,?)";
+      inserts = [
+        req.body.payload.companyName,
+        req.body.payload.location,
+      ];
+    } else {
+
+      sql = "INSERT INTO Company (companyName, location, year) VALUES (?,?,?)";
+      inserts = [
+        req.body.payload.companyName,
+        req.body.payload.location,
+        req.body.payload.year,
+      ];
+    }
+
     sql = mysql.pool.query(sql, inserts, function (error, results, fields) {
       if (error) {
         console.log(JSON.stringify(error));
