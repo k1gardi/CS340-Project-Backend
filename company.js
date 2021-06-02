@@ -89,13 +89,25 @@ module.exports = (function () {
     var context = {};
     console.log(req.body);
     var mysql = req.app.get("mysql");
-    var sql = `UPDATE Company SET companyName=?, location=?, year=? WHERE companyID=?`;
-    var inserts = [
-      req.body.data.companyName,
-      req.body.data.location,
-      req.body.data.year,
-      req.body.data.companyID,
-    ];
+    var sql = "";
+    var inserts;
+    if (req.body.data.year === ""){
+      sql = `UPDATE Company SET companyName=?, location=?, year=? WHERE companyID=?`;
+      inserts = [
+        req.body.data.companyName,
+        req.body.data.location,
+        null,
+        req.body.data.companyID,
+      ];
+    } else {
+      sql = `UPDATE Company SET companyName=?, location=?, year=? WHERE companyID=?`;
+      inserts = [
+        req.body.data.companyName,
+        req.body.data.location,
+        req.body.data.year,
+        req.body.data.companyID,
+      ];
+    }
     sql = mysql.pool.query(sql, inserts, function (error, results, fields) {
       if (error) {
         console.log(error);
