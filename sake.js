@@ -54,7 +54,7 @@ function getSomeSake(filter, res, mysql, context) {
    
   });
 
-  /* Get all Sake IDs and names*/
+  /* Get all Sake IDs and names for dropdown menus*/
 
   router.get("/dropdown/", function (req, res) {
     var context = {};

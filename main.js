@@ -3,20 +3,23 @@ const app = express();
 const cors = require("cors");
 const mysql = require('./dbcon');
 
+// Set up app and express
 app.use(cors());
 app.use(express.static('public'));
 app.use(express.json());
 app.set('port', 6531);
-
 app.use(express.urlencoded({extended:true}));
-// app.use('/static', express.static('public'));
+
+// Set requied path for each page's JS file
 app.set('mysql', mysql);
 app.use('/sake', require('./sake.js'));
 app.use('/company', require('./company.js'));
 app.use('/review', require('./review.js'));
 app.use('/reviewer', require('./reviewer.js'));
-// app.use('/', express.static('public'));
 
+
+
+// Error handlers
 app.use(function(req,res){
   res.type('text/plain');
   res.status(404);

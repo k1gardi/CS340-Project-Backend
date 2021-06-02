@@ -27,7 +27,7 @@ module.exports = (function () {
     getCompany(res, mysql, context);
   });
 
-  /* Get all Company IDs and names*/
+  /* Get all Company IDs and names for dropdown menus*/
 
   router.get("/dropdown/", function (req, res) {
     var context = {};
@@ -56,6 +56,8 @@ module.exports = (function () {
     var mysql = req.app.get("mysql");
     var sql = "";
     var inserts;
+
+    // If year is an empty string, don't include that attribute in the query
     if (req.body.payload.year === ""){
       sql = "INSERT INTO Company (companyName, location) VALUES (?,?)";
       inserts = [
@@ -91,6 +93,7 @@ module.exports = (function () {
     var mysql = req.app.get("mysql");
     var sql = "";
     var inserts;
+    // If year is an empty string, set the value to null for sending to MySQL
     if (req.body.data.year === ""){
       sql = `UPDATE Company SET companyName=?, location=?, year=? WHERE companyID=?`;
       inserts = [
